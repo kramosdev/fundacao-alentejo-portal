@@ -1,31 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { QuickActions } from "@/components/QuickActions";
 import { RecentActivity } from "@/components/RecentActivity";
 import { DashboardCard } from "@/components/DashboardCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/hooks/useAuth";
 import { BarChart3, TrendingUp, Clock, CheckCircle } from "lucide-react";
 import heroBanner from "@/assets/hero-banner.jpg";
 
-interface DashboardProps {
-  user?: {
-    name: string;
-    email: string;
-    avatar?: string;
-    role: 'user' | 'DGIEA' | 'direction' | 'admin';
-  };
-}
+export default function Dashboard() {
+  const { user, profile, loading } = useAuth()
+  const [selectedPeriod, setSelectedPeriod] = useState('30d')
 
-// Mock user for demonstration
-const mockUser = {
-  name: "Maria Silva",
-  email: "maria.silva@fundacao-alentejo.pt",
-  role: 'user' as const
-};
+  // Redirect to login if not authenticated
+  if (!loading && !user) {
+    return <Navigate to="/login" replace />
+  }
 
-export default function Dashboard({ user = mockUser }: DashboardProps) {
-  const [selectedPeriod, setSelectedPeriod] = useState('30d');
+  // Show loading while checking auth
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
+  // Use profile data if available, otherwise fallback
+  const currentUser = profile ? {
+    name: profile.full_name,
+    email: profile.email,
+    role: profile.role,
+    avatar: profile.avatar_url
+  } : {
+    name: user?.email?.split('@')[0] || "Utilizador",
+    email: user?.email || "",
+    role: 'colaborador' as const
+  }
 
   const handleActionClick = (action: string) => {
     console.log('Action clicked:', action);
@@ -67,7 +80,7 @@ export default function Dashboard({ user = mockUser }: DashboardProps) {
           { title: 'Taxa Aprovação', value: '89%', change: '+2%', icon: TrendingUp },
           { title: 'Tempo Médio', value: '2.4d', change: '-15%', icon: BarChart3 }
         ];
-      case 'direction':
+      case 'direcao':
         return [
           { title: 'Aprovações Pendentes', value: '5', change: '-10%', icon: Clock },
           { title: 'Aprovados Este Mês', value: '156', change: '+18%', icon: CheckCircle },
@@ -88,7 +101,7 @@ export default function Dashboard({ user = mockUser }: DashboardProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header user={user} />
+      <Header user={currentUser} />
       
       {/* Hero Section */}
       <div className="relative overflow-hidden">
@@ -101,7 +114,7 @@ export default function Dashboard({ user = mockUser }: DashboardProps) {
           <div className="container h-full flex items-center">
             <div className="text-white space-y-2 animate-fade-up">
               <h1 className="text-3xl font-bold">
-                Bem-vindo, {user.name.split(' ')[0]}
+                Bem-vindo, {currentUser.name.split(' ')[0]}
               </h1>
               <p className="text-lg text-white/90">
                 {getWelcomeMessage()}
@@ -135,13 +148,13 @@ export default function Dashboard({ user = mockUser }: DashboardProps) {
 
         {/* Quick Actions */}
         <div className="animate-slide-right">
-          <QuickActions userRole={user.role} onActionClick={handleActionClick} />
+          <QuickActions userRole={currentUser.role} onActionClick={handleActionClick} />
         </div>
 
         {/* Recent Activity and Progress */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 animate-fade-up" style={{ animationDelay: '0.3s' }}>
-            <RecentActivity userRole={user.role} />
+            <RecentActivity userRole={currentUser.role} />
           </div>
           
           <div className="space-y-6 animate-fade-up" style={{ animationDelay: '0.4s' }}>
