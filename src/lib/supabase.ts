@@ -1,24 +1,26 @@
 import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/integrations/supabase/types'
 
-// Get Supabase environment variables
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Centralized Supabase client (no env vars needed here)
+const SUPABASE_URL = 'https://ssbahthocmahojnduazb.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNzYmFodGhvY21haG9qbmR1YXpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg5Mjc0NTQsImV4cCI6MjA3NDUwMzQ1NH0.ucIIjNw3Y3RDMq0UfD-g4sz6srO2Ml7mbVL37pc3t8M'
 
-// Validate that Supabase is properly configured
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    'Supabase environment variables are missing. Please ensure your Supabase integration is properly connected via the green Supabase button in the top right of the interface.'
-  )
-}
-
-// Create Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true
-  }
+    detectSessionInUrl: true,
+  },
 })
+
+// Re-export database types for app-wide usage
+export type { Database }
+export type Profile = Database['public']['Tables']['profiles']['Row']
+export type Request = Database['public']['Tables']['requests']['Row']
+export type RequestCategory = Database['public']['Tables']['request_categories']['Row']
+export type Notification = Database['public']['Tables']['notifications']['Row']
+export type RequestHistory = Database['public']['Tables']['request_history']['Row']
+
 
 // Database types
 export interface Database {

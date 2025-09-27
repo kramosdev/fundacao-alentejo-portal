@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { User, Session } from '@supabase/supabase-js'
-import { supabase, Profile } from '@/lib/supabase'
+import { supabase, Profile, type Database } from '@/lib/supabase'
 import { useToast } from '@/hooks/use-toast'
 
 export function useAuth() {
@@ -212,7 +212,7 @@ export function useAuth() {
       setLoading(true)
       const { data, error } = await supabase
         .from('profiles')
-        .update(updates)
+        .update(updates as any)
         .eq('id', user.id)
         .select()
         .single()
