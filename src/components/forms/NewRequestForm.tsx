@@ -50,7 +50,7 @@ export function NewRequestForm({ onSuccess, onCancel }: NewRequestFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!user || !title || !description || !categoryId) {
+    if (!user || !title || !description || (categories.length > 0 && !categoryId)) {
       return
     }
 
@@ -86,7 +86,7 @@ export function NewRequestForm({ onSuccess, onCancel }: NewRequestFormProps) {
     setAttachments(prev => prev.filter((_, i) => i !== index))
   }
 
-  const isFormValid = title.trim() && description.trim() && categoryId
+  const isFormValid = !!(title.trim() && description.trim() && (categories.length === 0 || categoryId))
 
   return (
     <Card className="w-full max-w-2xl mx-auto portal-card">

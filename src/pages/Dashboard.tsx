@@ -6,13 +6,16 @@ import { RecentActivity } from "@/components/RecentActivity";
 import { DashboardCard } from "@/components/DashboardCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { BarChart3, TrendingUp, Clock, CheckCircle } from "lucide-react";
 import heroBanner from "@/assets/hero-banner.jpg";
+import { NewRequestForm } from "@/components/forms/NewRequestForm";
 
 export default function Dashboard() {
   const { user, profile, loading } = useAuth()
   const [selectedPeriod, setSelectedPeriod] = useState('30d')
+  const [openNewRequest, setOpenNewRequest] = useState(false)
 
   // Redirect to login if not authenticated
   if (!loading && !user) {
@@ -54,7 +57,8 @@ export default function Dashboard() {
     // Handle navigation based on action
     switch (action) {
       case 'new-request':
-        // Navigate to new request form
+        setOpenNewRequest(true)
+        break;
         break;
       case 'report-incident':
         // Navigate to incident report form
@@ -208,6 +212,13 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* New Request Modal */}
+      <Dialog open={openNewRequest} onOpenChange={setOpenNewRequest}>
+        <DialogContent className="max-w-2xl">
+          <NewRequestForm onSuccess={() => setOpenNewRequest(false)} onCancel={() => setOpenNewRequest(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
