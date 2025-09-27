@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { QuickActions } from "@/components/QuickActions";
-import { RecentActivity } from "@/components/RecentActivity";
+import { RealActivity } from "@/components/RealActivity";
+import { RealStats } from "@/components/RealStats";
 import { DashboardCard } from "@/components/DashboardCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -62,12 +63,38 @@ export default function Dashboard() {
       case 'new-request':
         setOpenNewRequest(true)
         break;
-        break;
       case 'report-incident':
-        // Navigate to incident report form
+        navigate('/requests')
         break;
       case 'my-requests':
-        // Navigate to user requests page
+        navigate('/requests')
+        break;
+      case 'review-requests':
+        navigate('/requests')
+        break;
+      case 'approve-requests':
+        navigate('/requests')
+        break;
+      case 'system-admin':
+        navigate('/admin')
+        break;
+      case 'user-management':
+        navigate('/admin')
+        break;
+      case 'reports':
+        navigate('/requests')
+        break;
+      case 'strategic-overview':
+        navigate('/requests')
+        break;
+      case 'audit-logs':
+        navigate('/requests')
+        break;
+      case 'system-reports':
+        navigate('/requests')
+        break;
+      case 'manage-incidents':
+        navigate('/requests')
         break;
       default:
         console.log('Unknown action:', action);
@@ -87,33 +114,6 @@ export default function Dashboard() {
     }
   };
 
-  const getStatsCards = () => {
-    switch (currentUser.role) {
-      case 'DGIEA':
-        return [
-          { title: 'Pedidos Pendentes', value: '8', change: '+12%', icon: Clock },
-          { title: 'Processados Hoje', value: '24', change: '+8%', icon: CheckCircle },
-          { title: 'Taxa Aprovação', value: '89%', change: '+2%', icon: TrendingUp },
-          { title: 'Tempo Médio', value: '2.4d', change: '-15%', icon: BarChart3 }
-        ];
-      case 'direction':
-        return [
-          { title: 'Aprovações Pendentes', value: '5', change: '-10%', icon: Clock },
-          { title: 'Aprovados Este Mês', value: '156', change: '+18%', icon: CheckCircle },
-          { title: 'Orçamento Utilizado', value: '67%', change: '+5%', icon: TrendingUp },
-          { title: 'Satisfação', value: '4.8', change: '+0.2', icon: BarChart3 }
-        ];
-      default:
-        return [
-          { title: 'Pedidos Ativos', value: '2', change: '0%', icon: Clock },
-          { title: 'Pedidos Aprovados', value: '15', change: '+25%', icon: CheckCircle },
-          { title: 'Taxa Sucesso', value: '94%', change: '+3%', icon: TrendingUp },
-          { title: 'Tempo Resposta', value: '1.8d', change: '-20%', icon: BarChart3 }
-        ];
-    }
-  };
-
-  const statsCards = getStatsCards();
 
   return (
     <div className="min-h-screen bg-background">
@@ -142,35 +142,18 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="container py-8 space-y-8">
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {statsCards.map((stat, index) => (
-            <Card key={stat.title} className="portal-card animate-scale-up" style={{ animationDelay: `${index * 0.1}s` }}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {stat.title}
-                </CardTitle>
-                <stat.icon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-                <p className={`text-xs ${stat.change.startsWith('+') ? 'text-success' : stat.change.startsWith('-') ? 'text-destructive' : 'text-muted-foreground'}`}>
-                  {stat.change} desde o último mês
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {/* Stats Overview - Real Data */}
+        <RealStats />
 
         {/* Quick Actions */}
         <div className="animate-slide-right">
           <QuickActions userRole={currentUser.role} onActionClick={handleActionClick} />
         </div>
 
-        {/* Recent Activity and Progress */}
+        {/* Real Activity from Database */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 animate-fade-up" style={{ animationDelay: '0.3s' }}>
-            <RecentActivity userRole={currentUser.role} />
+            <RealActivity />
           </div>
           
           <div className="space-y-6 animate-fade-up" style={{ animationDelay: '0.4s' }}>
