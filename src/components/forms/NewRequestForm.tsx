@@ -89,7 +89,7 @@ export function NewRequestForm({ onSuccess, onCancel }: NewRequestFormProps) {
   const isFormValid = !!(title.trim() && description.trim() && (categories.length === 0 || categoryId))
 
   return (
-    <Card className="w-full max-w-2xl mx-auto portal-card">
+    <Card className="w-full max-w-4xl mx-auto portal-card">
       <CardHeader>
         <CardTitle className="text-2xl font-bold flex items-center gap-2">
           <Plus className="h-6 w-6 text-primary" />

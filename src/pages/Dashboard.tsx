@@ -91,10 +91,13 @@ export default function Dashboard() {
         navigate('/requests')
         break;
       case 'system-reports':
-        navigate('/requests')
+        navigate('/system-reports')
         break;
       case 'manage-incidents':
-        navigate('/requests')
+        navigate('/incidents')
+        break;
+      case 'view-all-actions':
+        navigate('/quick-actions')
         break;
       default:
         console.log('Unknown action:', action);

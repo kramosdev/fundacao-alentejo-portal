@@ -202,27 +202,19 @@ export default function Profile() {
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="department">Departamento</Label>
-                    <Select 
-                      value={formData.department} 
-                      onValueChange={(value) => setFormData({...formData, department: value})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o departamento" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="DGIEA">DGIEA</SelectItem>
-                        <SelectItem value="Direção">Direção</SelectItem>
-                        <SelectItem value="Recursos Humanos">Recursos Humanos</SelectItem>
-                        <SelectItem value="Financeiro">Financeiro</SelectItem>
-                        <SelectItem value="Tecnologias">Tecnologias</SelectItem>
-                        <SelectItem value="Operações">Operações</SelectItem>
-                        <SelectItem value="Segurança">Segurança</SelectItem>
-                        <SelectItem value="Outro">Outro</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                   <div className="space-y-2">
+                     <Label htmlFor="department">Departamento</Label>
+                     <Input
+                       id="department"
+                       value={formData.department}
+                       disabled
+                       className="bg-muted"
+                       placeholder="Definido pelo administrador"
+                     />
+                     <p className="text-xs text-muted-foreground">
+                       O departamento é definido pelo administrador do sistema
+                     </p>
+                   </div>
                 </div>
 
                 <div className="space-y-2">

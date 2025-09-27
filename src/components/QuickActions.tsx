@@ -122,10 +122,7 @@ export function QuickActions({ userRole, onActionClick }: QuickActionsProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold text-foreground">Ações Rápidas</h2>
-        <Button variant="outline" size="sm" onClick={() => {
-          const viewId = userRole === 'user' ? 'my-requests' : userRole === 'DGIEA' ? 'review-requests' : userRole === 'direction' ? 'approve-requests' : 'system-admin'
-          onActionClick(viewId)
-        }}>
+        <Button variant="outline" size="sm" onClick={() => onActionClick('view-all-actions')}>
           Ver Todas
         </Button>
       </div>
