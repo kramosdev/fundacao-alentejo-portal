@@ -6,13 +6,13 @@ export interface AuditLog {
   id: string;
   created_at: string;
   action: string;
-  table_name?: string;
-  user_id?: string;
-  record_id?: string;
+  table_name?: string | null;
+  user_id?: string | null;
+  record_id?: string | null;
   old_values?: any;
   new_values?: any;
-  user_agent?: string;
-  ip_address?: string;
+  user_agent?: string | null;
+  ip_address?: string | null;
 }
 
 export function useAuditLogs() {
@@ -30,7 +30,7 @@ export function useAuditLogs() {
         .limit(100);
 
       if (error) throw error;
-      setLogs(data || []);
+      setLogs((data || []) as AuditLog[]);
     } catch (error: any) {
       console.error('Error fetching audit logs:', error);
       toast({

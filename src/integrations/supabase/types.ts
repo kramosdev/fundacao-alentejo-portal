@@ -556,7 +556,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      approve_user_registration: {
+        Args: {
+          assigned_department?: string
+          assigned_role?: string
+          registration_id: string
+        }
+        Returns: Json
+      }
+      create_audit_log: {
+        Args: {
+          action_name: string
+          new_values_param?: Json
+          old_values_param?: Json
+          record_id_param?: string
+          table_name_param?: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

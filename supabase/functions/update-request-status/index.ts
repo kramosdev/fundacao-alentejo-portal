@@ -12,34 +12,39 @@ serve(async (req) => {
   }
 
   try {
+    // Get the authorization header from the request
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Create authenticated supabase client
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
+        global: {
+          headers: { Authorization: authHeader }
         }
       }
     )
 
-    // Get the authorization header from the request
-    const authHeader = req.headers.get('Authorization')!
-    supabase.auth.setSession({
-      access_token: authHeader.replace('Bearer ', ''),
-      refresh_token: '',
-    })
-
-    const { request_id, new_status, notes, decision } = await req.json()
-
-    // Get current user and validate permissions
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    // Set session properly
+    const token = authHeader.replace('Bearer ', '')
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token)
+    
     if (userError || !user) {
+      console.error('Auth error:', userError)
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+
+    const { request_id, new_status, notes, decision } = await req.json()
 
     // Get user profile to check role
     const { data: profile } = await supabase
