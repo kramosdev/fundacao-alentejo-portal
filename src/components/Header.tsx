@@ -1,25 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Bell, User, LogOut, Settings, Menu, X, Home, FileText, UserCircle } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Bell, Menu, User, LogOut, Settings, Shield, Users, FileText, BarChart3, AlertTriangle, Zap, Activity } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { useNotifications } from "@/hooks/useNotifications"
-import { useNavigate, useLocation } from "react-router-dom"
 
 export function Header() {
   const { user, profile, signOut } = useAuth()
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const navigate = useNavigate()
+  const { notifications, unreadCount, markAsRead } = useNotifications()
   const location = useLocation()
+  const navigate = useNavigate()
+  const [isOpen, setIsOpen] = useState(false)
 
   const handleSignOut = async () => {
     await signOut()
@@ -28,206 +23,276 @@ export function Header() {
 
   const getNavigation = () => {
     const baseNav = [
-      { name: 'Dashboard', href: '/dashboard', icon: Home },
+      { name: 'Dashboard', href: '/dashboard', icon: Activity },
       { name: 'Requisições', href: '/requests', icon: FileText },
-      { name: 'Perfil', href: '/profile', icon: UserCircle },
+      { name: 'Incidentes', href: '/incidents', icon: AlertTriangle },
+      { name: 'Ações Rápidas', href: '/quick-actions', icon: Zap },
+      { name: 'Relatórios', href: '/reports', icon: BarChart3 }
     ]
-    
-    // Add admin link for admin users
-    if (profile?.role === 'admin') {
-      baseNav.push({ name: 'Admin', href: '/admin', icon: Settings })
+
+    // Add admin/direction only pages
+    if (profile?.role === 'admin' || profile?.role === 'direcao') {
+      baseNav.push(
+        { name: 'Gestão Utilizadores', href: '/user-management', icon: Users },
+        { name: 'Visão Estratégica', href: '/strategic-dashboard', icon: BarChart3 },
+        { name: 'Configurações', href: '/admin', icon: Settings }
+      )
     }
-    
+
     return baseNav
   }
-
-  const navigation = getNavigation()
 
   const isActive = (href: string) => location.pathname === href
 
   const getInitials = (name: string) => {
     return name
       .split(' ')
-      .map(word => word.charAt(0))
+      .map(n => n[0])
       .join('')
       .toUpperCase()
       .slice(0, 2)
   }
 
   const roleLabels = {
-    'colaborador': 'Colaborador',
-    'DGIEA': 'DGIEA',
+    'admin': 'Administrador',
     'direcao': 'Direção',
-    'admin': 'Administrador'
+    'DGIEA': 'DGIEA',
+    'colaborador': 'Colaborador'
   }
 
   const roleColors = {
-    'colaborador': 'bg-blue-100 text-blue-800',
-    'DGIEA': 'bg-purple-100 text-purple-800',
-    'direcao': 'bg-orange-100 text-orange-800',
-    'admin': 'bg-red-100 text-red-800'
+    'admin': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+    'direcao': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+    'DGIEA': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+    'colaborador': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
   }
 
-  if (!user) {
-    return null
-  }
+  if (!user) return null
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex items-center">
-            <h1 className="text-xl font-bold text-primary cursor-pointer" onClick={() => navigate('/dashboard')}>
-              Sistema de Requisições
-            </h1>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            {navigation.map((item) => {
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 max-w-screen-2xl items-center">
+        <div className="mr-4 hidden md:flex">
+          <Link className="mr-6 flex items-center space-x-2 transition-transform hover:scale-105" to="/dashboard">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+              <span className="text-white font-bold text-sm">FG</span>
+            </div>
+            <span className="hidden font-bold sm:inline-block bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              Fundação Gestão
+            </span>
+          </Link>
+          <nav className="flex items-center gap-6 text-sm">
+            {getNavigation().map((item) => {
               const Icon = item.icon
               return (
-                <button
-                  key={item.name}
-                  onClick={() => navigate(item.href)}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className={`transition-all flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-accent/50 hover:text-accent-foreground ${
                     isActive(item.href)
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                      ? 'bg-primary/10 text-primary font-medium shadow-sm border border-primary/20'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  <Icon className="h-4 w-4 mr-2" />
+                  <Icon className="h-4 w-4" />
                   {item.name}
-                </button>
+                </Link>
               )
             })}
           </nav>
+        </div>
 
-          {/* Right side actions */}
-          <div className="flex items-center space-x-4">
-            {/* Mobile menu toggle */}
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+          <SheetTrigger asChild>
             <Button
               variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
             >
-              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              <Menu className="h-6 w-6" />
+              <span className="sr-only">Toggle Menu</span>
             </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="pr-0">
+            <div className="flex items-center space-x-2 mb-8">
+              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+                <span className="text-white font-bold text-sm">FG</span>
+              </div>
+              <span className="font-bold">Fundação Gestão</span>
+            </div>
+            <nav className="flex flex-col gap-3">
+              {getNavigation().map((item) => {
+                const Icon = item.icon
+                return (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`transition-all flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-accent/50 ${
+                      isActive(item.href)
+                        ? 'bg-primary/10 text-primary font-medium shadow-sm border border-primary/20'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                    {item.name}
+                  </Link>
+                )
+              })}
+            </nav>
+          </SheetContent>
+        </Sheet>
 
+        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+          <div className="w-full flex-1 md:w-auto md:flex-none">
+            <div className="md:hidden">
+              <Link className="flex items-center space-x-2" to="/dashboard">
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">FG</span>
+                </div>
+                <span className="font-bold">FG</span>
+              </Link>
+            </div>
+          </div>
+          <nav className="flex items-center gap-2">
             {/* Notifications */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
-                  <Bell className="h-4 w-4" />
+                <Button variant="ghost" size="icon" className="relative hover:bg-accent/50">
+                  <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-destructive text-xs text-destructive-foreground flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center animate-pulse">
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-80" align="end">
-                <div className="flex items-center justify-between px-2 py-1">
-                  <p className="text-sm font-medium">Notificações</p>
+              <DropdownMenuContent align="end" className="w-80">
+                <DropdownMenuLabel className="flex items-center justify-between">
+                  Notificações
                   {unreadCount > 0 && (
-                    <button className="text-xs text-primary hover:underline" onClick={() => markAllAsRead()}>
-                      Marcar todas como lidas
-                    </button>
+                    <Badge variant="secondary" className="text-xs">
+                      {unreadCount} não lidas
+                    </Badge>
                   )}
-                </div>
-                <div className="max-h-80 overflow-auto">
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <div className="max-h-80 overflow-y-auto">
                   {notifications.length === 0 ? (
-                    <div className="p-4 text-sm text-muted-foreground">Sem notificações</div>
+                    <div className="p-4 text-center text-muted-foreground">
+                      Nenhuma notificação
+                    </div>
                   ) : (
-                    notifications.map((n) => (
-                      <div key={n.id} className={`px-3 py-2 text-sm border-t first:border-t-0 ${n.is_read ? 'bg-background' : 'bg-muted/50'}`}>
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <p className="font-medium">{n.title}</p>
-                            <p className="text-muted-foreground text-xs">{n.message}</p>
+                    notifications.slice(0, 5).map((notification) => (
+                      <DropdownMenuItem
+                        key={notification.id}
+                        className="flex flex-col items-start p-4 cursor-pointer hover:bg-accent/50"
+                        onClick={() => markAsRead(notification.id)}
+                      >
+                        <div className="flex w-full items-start justify-between">
+                          <div className="flex-1">
+                            <p className="font-medium text-sm">{notification.title}</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {notification.message}
+                            </p>
                           </div>
-                          {!n.is_read && (
-                            <button className="text-xs text-primary hover:underline" onClick={() => markAsRead(n.id)}>
-                              Marcar lida
-                            </button>
+                          {!notification.is_read && (
+                            <div className="h-2 w-2 bg-primary rounded-full ml-2 mt-1 flex-shrink-0" />
                           )}
                         </div>
-                      </div>
+                      </DropdownMenuItem>
                     ))
                   )}
                 </div>
+                {notifications.length > 5 && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-center text-primary hover:bg-primary/10">
+                      Ver todas as notificações
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* User dropdown */}
+            {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={profile?.avatar_url} />
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      {profile?.full_name ? getInitials(profile.full_name) : 'U'}
-                    </AvatarFallback>
-                  </Avatar>
+                <Button variant="ghost" className="relative h-10 w-auto px-3 hover:bg-accent/50">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-8 w-8 ring-2 ring-primary/20">
+                      <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
+                      <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/30 text-primary font-medium">
+                        {profile?.full_name ? getInitials(profile.full_name) : 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="hidden md:flex md:flex-col md:items-start">
+                      <span className="text-sm font-medium">{profile?.full_name}</span>
+                      <Badge 
+                        className={`text-xs ${roleColors[profile?.role as keyof typeof roleColors] || 'bg-gray-100 text-gray-800'}`}
+                      >
+                        {roleLabels[profile?.role as keyof typeof roleLabels] || profile?.role}
+                      </Badge>
+                    </div>
+                  </div>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end">
-                <div className="flex items-center justify-start gap-2 p-2">
-                  <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">{profile?.full_name || user.email}</p>
-                    <p className="text-xs text-muted-foreground">{profile?.email || user.email}</p>
-                    {profile?.role && (
-                      <Badge className={roleColors[profile.role as keyof typeof roleColors] || 'bg-gray-100 text-gray-800'}>
-                        {roleLabels[profile.role as keyof typeof roleLabels] || profile.role}
-                      </Badge>
+              <DropdownMenuContent className="w-64" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
+                        <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/30 text-primary font-medium">
+                          {profile?.full_name ? getInitials(profile.full_name) : 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <p className="text-sm font-medium leading-none">{profile?.full_name}</p>
+                        <p className="text-xs leading-none text-muted-foreground mt-1">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge 
+                      className={`w-fit ${roleColors[profile?.role as keyof typeof roleColors] || 'bg-gray-100 text-gray-800'}`}
+                    >
+                      {roleLabels[profile?.role as keyof typeof roleLabels] || profile?.role}
+                    </Badge>
+                    {profile?.department && (
+                      <p className="text-xs text-muted-foreground">
+                        {profile.department}
+                      </p>
                     )}
                   </div>
-                </div>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate('/profile')}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Perfil</span>
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Perfil
+                  </Link>
                 </DropdownMenuItem>
+                {(profile?.role === 'admin' || profile?.role === 'direcao') && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin" className="flex items-center gap-2">
+                      <Shield className="h-4 w-4" />
+                      Administração
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Terminar Sessão</span>
+                <DropdownMenuItem 
+                  className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Terminar Sessão
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
+          </nav>
         </div>
       </div>
-
-      {/* Mobile menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-card border-t">
-            {navigation.map((item) => {
-              const Icon = item.icon
-              return (
-                <button
-                  key={item.name}
-                  onClick={() => {
-                    navigate(item.href)
-                    setIsMobileMenuOpen(false)
-                  }}
-                  className={`flex items-center w-full px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                    isActive(item.href)
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                  }`}
-                >
-                  <Icon className="h-4 w-4 mr-2" />
-                  {item.name}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      )}
     </header>
   )
 }

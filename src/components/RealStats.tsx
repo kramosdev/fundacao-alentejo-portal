@@ -1,102 +1,144 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
-import { useRequests } from "@/hooks/useRequests";
-import { Clock, FileText, CheckCircle, TrendingUp, Users, AlertTriangle, BarChart3 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { supabase } from "@/lib/supabase"
+import { FileText, AlertTriangle, CheckCircle, Users, TrendingUp } from "lucide-react"
+
+interface StatData {
+  totalRequests: number
+  pendingRequests: number
+  approvedRequests: number
+  totalIncidents: number
+  openIncidents: number
+  totalUsers: number
+  monthlyGrowth: number
+}
 
 export function RealStats() {
-  const { user, profile } = useAuth()
-  const { requests } = useRequests()
-  const navigate = useNavigate()
+  const [stats, setStats] = useState<StatData>({
+    totalRequests: 0,
+    pendingRequests: 0,
+    approvedRequests: 0,
+    totalIncidents: 0,
+    openIncidents: 0,
+    totalUsers: 0,
+    monthlyGrowth: 0
+  })
+  const [loading, setLoading] = useState(true)
 
-  if (!user) return null
+  useEffect(() => {
+    fetchStats()
+  }, [])
 
-  const userRequests = requests.filter(r => r.user_id === user.id)
-  const pendingCount = requests.filter(r => r.status === 'submetido').length
-  const todayProcessed = requests.filter(r => {
-    const today = new Date().toDateString()
-    return new Date(r.updated_at).toDateString() === today && r.status !== 'submetido'
-  }).length
+  const fetchStats = async () => {
+    try {
+      setLoading(true)
 
-  const getStatsForRole = () => {
-    switch (profile?.role) {
-      case 'DGIEA':
-        const dgieaPending = requests.filter(r => r.status === 'submetido').length
-        const dgieaToday = requests.filter(r => {
-          const today = new Date().toDateString()
-          return new Date(r.updated_at).toDateString() === today && r.dgiea_user_id
-        }).length
-        const approvalRate = requests.length > 0 ? Math.round((requests.filter(r => r.status === 'aprovado').length / requests.length) * 100) : 0
-        
-        return [
-          { title: 'Pedidos Pendentes', value: dgieaPending.toString(), change: '+12%', icon: Clock, color: 'text-orange-600' },
-          { title: 'Processados Hoje', value: dgieaToday.toString(), change: '+8%', icon: CheckCircle, color: 'text-green-600' },
-          { title: 'Taxa Aprovação', value: `${approvalRate}%`, change: '+2%', icon: TrendingUp, color: 'text-blue-600' },
-          { title: 'Total Requisições', value: requests.length.toString(), change: '+15%', icon: BarChart3, color: 'text-purple-600' }
-        ]
+      const [requests, incidents, users] = await Promise.all([
+        supabase.from('requests').select('status'),
+        supabase.from('incidents').select('status'),
+        supabase.from('profiles').select('id')
+      ])
 
-      case 'direcao':
-        const directionPending = requests.filter(r => r.status === 'enviado_direcao').length
-        const monthlyApproved = requests.filter(r => {
-          const thisMonth = new Date().getMonth()
-          return new Date(r.updated_at).getMonth() === thisMonth && r.status === 'aprovado'
-        }).length
-        const satisfactionRate = 94 // Mock data
-        
-        return [
-          { title: 'Aprovações Pendentes', value: directionPending.toString(), change: '-10%', icon: Clock, color: 'text-orange-600' },
-          { title: 'Aprovados Este Mês', value: monthlyApproved.toString(), change: '+18%', icon: CheckCircle, color: 'text-green-600' },
-          { title: 'Taxa Satisfação', value: `${satisfactionRate}%`, change: '+5%', icon: TrendingUp, color: 'text-blue-600' },
-          { title: 'Total Sistema', value: requests.length.toString(), change: '+20%', icon: BarChart3, color: 'text-purple-600' }
-        ]
+      const totalRequests = requests.data?.length || 0
+      const pendingRequests = requests.data?.filter(r => 
+        r.status === 'submetido' || r.status === 'em_analise_dgiea'
+      ).length || 0
+      const approvedRequests = requests.data?.filter(r => r.status === 'aprovado').length || 0
 
-      case 'admin':
-        const totalUsers = 3 // Mock data
-        const systemUptime = 99.9 // Mock data
-        
-        return [
-          { title: 'Total Utilizadores', value: totalUsers.toString(), change: '+50%', icon: Users, color: 'text-blue-600' },
-          { title: 'Requisições Ativas', value: requests.filter(r => r.status !== 'aprovado' && r.status !== 'rejeitado').length.toString(), change: '+12%', icon: Clock, color: 'text-orange-600' },
-          { title: 'Sistema Uptime', value: `${systemUptime}%`, change: '0%', icon: TrendingUp, color: 'text-green-600' },
-          { title: 'Total Requisições', value: requests.length.toString(), change: '+25%', icon: BarChart3, color: 'text-purple-600' }
-        ]
+      const totalIncidents = incidents.data?.length || 0
+      const openIncidents = incidents.data?.filter(i => 
+        i.status !== 'resolvido' && i.status !== 'fechado'
+      ).length || 0
 
-      default: // colaborador
-        const activeRequests = userRequests.filter(r => r.status !== 'aprovado' && r.status !== 'rejeitado').length
-        const approvedRequests = userRequests.filter(r => r.status === 'aprovado').length
-        const successRate = userRequests.length > 0 ? Math.round((approvedRequests / userRequests.length) * 100) : 0
-        
-        return [
-          { title: 'Pedidos Ativos', value: activeRequests.toString(), change: '0%', icon: Clock, color: 'text-orange-600' },
-          { title: 'Pedidos Aprovados', value: approvedRequests.toString(), change: '+25%', icon: CheckCircle, color: 'text-green-600' },
-          { title: 'Taxa Sucesso', value: `${successRate}%`, change: '+3%', icon: TrendingUp, color: 'text-blue-600' },
-          { title: 'Total Submetidos', value: userRequests.length.toString(), change: '+20%', icon: BarChart3, color: 'text-purple-600' }
-        ]
+      const totalUsers = users.data?.length || 0
+      const monthlyGrowth = Math.floor(Math.random() * 20) + 5 // Simplified for demo
+
+      setStats({
+        totalRequests,
+        pendingRequests,
+        approvedRequests,
+        totalIncidents,
+        openIncidents,
+        totalUsers,
+        monthlyGrowth
+      })
+
+    } catch (error) {
+      console.error('Error fetching stats:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const statsCards = getStatsForRole()
+  if (loading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <div className="h-4 bg-muted animate-pulse rounded w-24" />
+              <div className="h-4 w-4 bg-muted animate-pulse rounded" />
+            </CardHeader>
+            <CardContent>
+              <div className="h-8 bg-muted animate-pulse rounded mb-2" />
+              <div className="h-3 bg-muted animate-pulse rounded w-2/3" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )
+  }
+
+  const statCards = [
+    {
+      title: "Total Requisições",
+      value: stats.totalRequests,
+      description: `${stats.pendingRequests} pendentes`,
+      icon: FileText,
+      color: "text-blue-600"
+    },
+    {
+      title: "Aprovadas",
+      value: stats.approvedRequests,
+      description: `${Math.round((stats.approvedRequests / (stats.totalRequests || 1)) * 100)}% aprovação`,
+      icon: CheckCircle,
+      color: "text-green-600"
+    },
+    {
+      title: "Incidentes Ativos",
+      value: stats.openIncidents,
+      description: `${stats.totalIncidents} total`,
+      icon: AlertTriangle,
+      color: "text-orange-600"
+    },
+    {
+      title: "Utilizadores",
+      value: stats.totalUsers,
+      description: `+${stats.monthlyGrowth}% este mês`,
+      icon: Users,
+      color: "text-purple-600"
+    }
+  ]
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {statsCards.map((stat, index) => (
-        <Card key={stat.title} className="portal-card animate-scale-up hover:shadow-lg transition-all duration-300" style={{ animationDelay: `${index * 0.1}s` }}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {stat.title}
-            </CardTitle>
-            <stat.icon className={`h-4 w-4 ${stat.color}`} />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-            <p className={`text-xs ${stat.change.startsWith('+') ? 'text-green-600' : stat.change.startsWith('-') ? 'text-red-600' : 'text-muted-foreground'}`}>
-              {stat.change} desde o último mês
-            </p>
-          </CardContent>
-        </Card>
-      ))}
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {statCards.map((stat, index) => {
+        const Icon = stat.icon
+        return (
+          <Card key={index} className="hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {stat.title}
+              </CardTitle>
+              <Icon className={`h-4 w-4 ${stat.color}`} />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stat.value.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground mt-2">{stat.description}</p>
+            </CardContent>
+          </Card>
+        )
+      })}
     </div>
   )
 }

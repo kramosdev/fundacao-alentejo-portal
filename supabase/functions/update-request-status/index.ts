@@ -58,7 +58,7 @@ serve(async (req) => {
     // Get current request
     const { data: currentRequest } = await supabase
       .from('requests')
-      .select('*, profiles!requests_user_id_fkey(full_name, email)')
+      .select('*')
       .eq('id', request_id)
       .single()
 
@@ -112,7 +112,7 @@ serve(async (req) => {
       .from('requests')
       .update(updateData)
       .eq('id', request_id)
-      .select('*, profiles!requests_user_id_fkey(full_name, email)')
+      .select('*')
       .single()
 
     if (updateError) {
@@ -139,13 +139,13 @@ serve(async (req) => {
     if (new_status === 'enviado_direcao') {
       const { data: directionUsers } = await supabase
         .from('profiles')
-        .select('id')
+        .select('user_id')
         .eq('role', 'direcao')
         .eq('is_active', true)
 
       if (directionUsers && directionUsers.length > 0) {
         const directionNotifications = directionUsers.map(dirUser => ({
-          user_id: dirUser.id,
+          user_id: dirUser.user_id,
           request_id: request_id,
           title: 'Requisição para Aprovação',
           message: `Requisição "${updatedRequest.title}" aguarda aprovação da Direção`,
