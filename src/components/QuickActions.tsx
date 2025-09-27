@@ -18,7 +18,7 @@ export function QuickActions({ userRole, onActionClick }: QuickActionsProps) {
             description: 'Rever e processar pedidos submetidos',
             icon: FileText,
             variant: 'primary' as const,
-            count: '8 novos'
+            count: '3 novos'
           },
           {
             id: 'manage-incidents',
@@ -26,7 +26,7 @@ export function QuickActions({ userRole, onActionClick }: QuickActionsProps) {
             description: 'Acompanhar incidentes reportados',
             icon: AlertTriangle,
             variant: 'accent' as const,
-            count: '3 críticos'
+            count: '1 crítico'
           },
           {
             id: 'user-management',
@@ -45,7 +45,7 @@ export function QuickActions({ userRole, onActionClick }: QuickActionsProps) {
             description: 'Decisões finais sobre pedidos',
             icon: FileText,
             variant: 'primary' as const,
-            count: '5 aguardam'
+            count: '2 aguardam'
           },
           {
             id: 'reports',
@@ -110,7 +110,7 @@ export function QuickActions({ userRole, onActionClick }: QuickActionsProps) {
             description: 'Consultar estado dos seus pedidos',
             icon: Clock,
             variant: 'secondary' as const,
-            count: '2 ativos'
+            count: '1 ativo'
           }
         ];
     }

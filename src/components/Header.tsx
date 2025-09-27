@@ -72,30 +72,30 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-screen-2xl items-center">
-        <div className="mr-4 hidden md:flex">
+        <div className="mr-4 hidden lg:flex">
           <Link className="mr-6 flex items-center space-x-2 transition-transform hover:scale-105" to="/dashboard">
             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
               <span className="text-white font-bold text-sm">FG</span>
             </div>
-            <span className="hidden font-bold sm:inline-block bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            <span className="hidden font-bold xl:inline-block bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
               Fundação Gestão
             </span>
           </Link>
-          <nav className="flex items-center gap-6 text-sm">
+          <nav className="flex items-center gap-2 text-sm">
             {getNavigation().map((item) => {
               const Icon = item.icon
               return (
                 <Link
                   key={item.href}
                   to={item.href}
-                  className={`transition-all flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-accent/50 hover:text-accent-foreground ${
+                  className={`transition-all flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-accent/50 hover:text-accent-foreground ${
                     isActive(item.href)
                       ? 'bg-primary/10 text-primary font-medium shadow-sm border border-primary/20'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
-                  {item.name}
+                  <span className="hidden xl:inline">{item.name}</span>
                 </Link>
               )
             })}
@@ -143,8 +143,8 @@ export function Header() {
         </Sheet>
 
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none">
-            <div className="md:hidden">
+          <div className="w-full flex-1 lg:w-auto lg:flex-none">
+            <div className="lg:hidden">
               <Link className="flex items-center space-x-2" to="/dashboard">
                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
                   <span className="text-white font-bold text-sm">FG</span>
@@ -225,7 +225,7 @@ export function Header() {
                         {profile?.full_name ? getInitials(profile.full_name) : 'U'}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="hidden md:flex md:flex-col md:items-start">
+                    <div className="hidden lg:flex lg:flex-col lg:items-start">
                       <span className="text-sm font-medium">{profile?.full_name}</span>
                       <Badge 
                         className={`text-xs ${roleColors[profile?.role as keyof typeof roleColors] || 'bg-gray-100 text-gray-800'}`}

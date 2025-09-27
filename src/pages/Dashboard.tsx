@@ -124,22 +124,33 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      {/* Hero Section */}
+        {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div 
-          className="h-48 bg-cover bg-center bg-no-repeat"
+          className="h-64 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(33, 41, 60, 0.8), rgba(55, 125, 255, 0.6)), url(${heroBanner})`
+            backgroundImage: `linear-gradient(135deg, rgba(33, 41, 60, 0.85), rgba(55, 125, 255, 0.7)), url(${heroBanner})`
           }}
         >
-          <div className="container h-full flex items-center">
-            <div className="text-white space-y-2 animate-fade-up">
-              <h1 className="text-3xl font-bold">
+          <div className="container h-full flex items-center justify-between">
+            <div className="text-white space-y-3 animate-fade-up">
+              <h1 className="text-4xl font-bold">
                 Bem-vindo, {currentUser.name.split(' ')[0]}
               </h1>
-              <p className="text-lg text-white/90">
+              <p className="text-xl text-white/90">
                 {getWelcomeMessage()}
               </p>
+              <div className="text-sm text-white/80 space-y-1">
+                <p>📅 Hoje: {format(new Date(), "EEEE, d 'de' MMMM 'de' yyyy", { locale: pt })}</p>
+                <p>🕐 {format(new Date(), 'HH:mm', { locale: pt })}</p>
+              </div>
+            </div>
+            <div className="hidden md:block text-white/60 text-right animate-fade-up" style={{ animationDelay: '0.2s' }}>
+              <div className="space-y-2">
+                <div className="text-sm">Sistema de Gestão</div>
+                <div className="text-2xl font-bold">FGA</div>
+                <div className="text-xs">Fundação Gestão Alentejo</div>
+              </div>
             </div>
           </div>
         </div>
@@ -186,9 +197,9 @@ export default function Dashboard() {
                 <div>
                   <div className="flex justify-between text-sm mb-2">
                     <span>Eficiência do Sistema</span>
-                    <span>92%</span>
+                    <span>{Math.round(((requests?.filter(r => r.status !== 'submetido').length || 0) / Math.max(requests?.length || 1, 1)) * 100)}%</span>
                   </div>
-                  <Progress value={92} className="h-2" />
+                  <Progress value={((requests?.filter(r => r.status !== 'submetido').length || 0) / Math.max(requests?.length || 1, 1)) * 100} className="h-2" />
                 </div>
               </CardContent>
             </Card>

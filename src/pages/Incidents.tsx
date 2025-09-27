@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast"
 import { AlertTriangle, Plus, Search, Filter, Monitor, Wifi, HardDrive, Shield } from "lucide-react"
 import { format } from "date-fns"
 import { pt } from "date-fns/locale"
+import { IncidentTicketSystem } from "@/components/IncidentTicketSystem"
 
 interface Incident {
   id: string
@@ -82,6 +83,7 @@ export default function Incidents() {
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [isLoading, setIsLoading] = useState(true)
   const [showNewIncident, setShowNewIncident] = useState(false)
+  const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null)
   const [newIncident, setNewIncident] = useState({
     title: '',
     description: '',
@@ -345,7 +347,11 @@ export default function Incidents() {
                   {filteredIncidents.map((incident) => {
                     const CategoryIcon = categoryIcons[incident.category]
                     return (
-                      <TableRow key={incident.id}>
+                      <TableRow 
+                        key={incident.id} 
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => setSelectedIncident(incident)}
+                      >
                         <TableCell>
                           <div>
                             <p className="font-medium">{incident.title}</p>
@@ -395,6 +401,58 @@ export default function Incidents() {
             </div>
           </CardContent>
         </Card>
+        
+        {/* Incident Detail Modal with Ticket System */}
+        {selectedIncident && (
+          <Dialog open={!!selectedIncident} onOpenChange={() => setSelectedIncident(null)}>
+            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-2xl font-bold">{selectedIncident.title}</h2>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Badge className={statusColors[selectedIncident.status]}>
+                      {statusLabels[selectedIncident.status]}
+                    </Badge>
+                    <Badge className={priorityColors[selectedIncident.priority]}>
+                      {selectedIncident.priority}
+                    </Badge>
+                    <Badge variant="outline">
+                      {categoryLabels[selectedIncident.category]}
+                    </Badge>
+                  </div>
+                </div>
+                
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <h3 className="font-semibold mb-2">Descrição</h3>
+                    <p className="text-sm text-muted-foreground">{selectedIncident.description}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-2">Detalhes</h3>
+                    <div className="space-y-1 text-sm">
+                      <p><strong>Localização:</strong> {selectedIncident.location || 'N/A'}</p>
+                      <p><strong>Reportado por:</strong> {selectedIncident.profiles?.full_name}</p>
+                      <p><strong>Email:</strong> {selectedIncident.profiles?.email}</p>
+                      <p><strong>Data:</strong> {format(new Date(selectedIncident.created_at), 'dd/MM/yyyy HH:mm', { locale: pt })}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Ticket System */}
+                <IncidentTicketSystem
+                  incidentId={selectedIncident.id}
+                  incidentTitle={selectedIncident.title}
+                  incidentStatus={selectedIncident.status}
+                  userRole={profile?.role || 'colaborador'}
+                  onStatusUpdate={(newStatus) => {
+                    setSelectedIncident({...selectedIncident, status: newStatus as any})
+                    fetchIncidents() // Refresh the main list
+                  }}
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </main>
     </div>
   )

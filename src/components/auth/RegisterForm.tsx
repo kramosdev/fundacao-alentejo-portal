@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { useAuth } from "@/hooks/useAuth"
+import { useToast } from "@/hooks/use-toast"
+import { supabase } from "@/lib/supabase"
 import { Eye, EyeOff, Mail, Lock, User, Shield } from "lucide-react"
 
 interface RegisterFormProps {
@@ -20,6 +22,7 @@ export function RegisterForm({ onSuccess, onToggleMode }: RegisterFormProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const { signUpWithEmail, signInWithMicrosoft, loading } = useAuth()
+  const { toast } = useToast()
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,10 +39,34 @@ export function RegisterForm({ onSuccess, onToggleMode }: RegisterFormProps) {
       return
     }
 
-    const { error } = await signUpWithEmail(email, password, fullName)
-    
-    if (!error && onSuccess) {
-      onSuccess()
+    try {
+      // Create pending registration record
+      const { error: pendingError } = await supabase
+        .from('pending_registrations')
+        .insert({
+          email,
+          full_name: fullName,
+          requested_role: 'colaborador',
+          status: 'pending'
+        })
+
+      if (pendingError) throw pendingError
+
+      toast({
+        title: "Registo submetido",
+        description: "O seu registo foi submetido para aprovação da Direção. Será notificado por email quando for aprovado.",
+        duration: 5000
+      })
+
+      if (onSuccess) {
+        onSuccess()
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erro no registo",
+        description: error.message,
+        variant: "destructive"
+      })
     }
   }
 

@@ -67,7 +67,7 @@ export function RealActivity() {
               {profile?.role === 'colaborador' ? 'As suas últimas requisições' : 'Últimas requisições no sistema'}
             </CardDescription>
           </div>
-          <Button variant="outline" size="sm" onClick={() => navigate('/requests')}>
+          <Button variant="outline" size="sm" onClick={() => navigate('/all-activity')}>
             Ver Tudo
           </Button>
         </div>

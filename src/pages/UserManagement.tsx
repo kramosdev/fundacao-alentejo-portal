@@ -180,7 +180,7 @@ export default function UserManagement() {
       .slice(0, 2)
   }
 
-  if (loading || isLoading) {
+  if (loading || loading) {
     return (
       <div className="min-h-screen bg-background">
         <Header />

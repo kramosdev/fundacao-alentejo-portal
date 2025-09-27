@@ -14,6 +14,7 @@ import Incidents from "./pages/Incidents";
 import QuickActionsHub from "./pages/QuickActionsHub";
 import Reports from "./pages/Reports";
 import StrategicDashboard from "./pages/StrategicDashboard";
+import AllActivity from "./pages/AllActivity";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/quick-actions" element={<QuickActionsHub />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/strategic-dashboard" element={<StrategicDashboard />} />
+          <Route path="/all-activity" element={<AllActivity />} />
           <Route path="/audit-logs" element={<Reports />} />
           <Route path="/system-reports" element={<Reports />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
