@@ -16,7 +16,7 @@ import { useNavigate, useLocation } from "react-router-dom"
 
 export function Header() {
   const { user, profile, signOut } = useAuth()
-  const { unreadCount } = useNotifications()
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
@@ -117,14 +117,49 @@ export function Header() {
             </Button>
 
             {/* Notifications */}
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-4 w-4" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-destructive text-xs text-destructive-foreground flex items-center justify-center">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
-              )}
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative">
+                  <Bell className="h-4 w-4" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-destructive text-xs text-destructive-foreground flex items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-80" align="end">
+                <div className="flex items-center justify-between px-2 py-1">
+                  <p className="text-sm font-medium">Notificações</p>
+                  {unreadCount > 0 && (
+                    <button className="text-xs text-primary hover:underline" onClick={() => markAllAsRead()}>
+                      Marcar todas como lidas
+                    </button>
+                  )}
+                </div>
+                <div className="max-h-80 overflow-auto">
+                  {notifications.length === 0 ? (
+                    <div className="p-4 text-sm text-muted-foreground">Sem notificações</div>
+                  ) : (
+                    notifications.map((n) => (
+                      <div key={n.id} className={`px-3 py-2 text-sm border-t first:border-t-0 ${n.is_read ? 'bg-background' : 'bg-muted/50'}`}>
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <p className="font-medium">{n.title}</p>
+                            <p className="text-muted-foreground text-xs">{n.message}</p>
+                          </div>
+                          {!n.is_read && (
+                            <button className="text-xs text-primary hover:underline" onClick={() => markAsRead(n.id)}>
+                              Marcar lida
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* User dropdown */}
             <DropdownMenu>

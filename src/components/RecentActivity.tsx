@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, FileText, AlertTriangle, CheckCircle, XCircle, Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface ActivityItem {
   id: string;
@@ -58,6 +59,7 @@ const mockActivities: ActivityItem[] = [
 ];
 
 export function RecentActivity({ userRole }: RecentActivityProps) {
+  const navigate = useNavigate()
   const getIcon = (type: ActivityItem['type']) => {
     switch (type) {
       case 'request': return FileText;
@@ -117,7 +119,7 @@ export function RecentActivity({ userRole }: RecentActivityProps) {
             <CardTitle className="text-xl">Atividade Recente</CardTitle>
             <CardDescription>Últimas atualizações e eventos</CardDescription>
           </div>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={() => navigate('/requests')}>
             Ver Tudo
           </Button>
         </div>
@@ -135,6 +137,7 @@ export function RecentActivity({ userRole }: RecentActivityProps) {
               <div
                 key={activity.id}
                 className={`flex items-start space-x-4 p-4 rounded-lg border-l-4 bg-muted/20 hover:bg-muted/30 transition-colors cursor-pointer ${getPriorityColor(activity.priority)}`}
+                onClick={() => navigate('/requests')}
               >
                 <div className="flex-shrink-0">
                   <div className="p-2 rounded-lg bg-background border">

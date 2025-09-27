@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { QuickActions } from "@/components/QuickActions";
 import { RecentActivity } from "@/components/RecentActivity";
@@ -16,6 +16,7 @@ import { pt } from "date-fns/locale";
 
 export default function Dashboard() {
   const { user, profile, loading } = useAuth()
+  const navigate = useNavigate()
   const [selectedPeriod, setSelectedPeriod] = useState('30d')
   const [openNewRequest, setOpenNewRequest] = useState(false)
 

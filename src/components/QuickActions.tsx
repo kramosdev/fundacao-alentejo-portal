@@ -122,7 +122,10 @@ export function QuickActions({ userRole, onActionClick }: QuickActionsProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold text-foreground">Ações Rápidas</h2>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" onClick={() => {
+          const viewId = userRole === 'user' ? 'my-requests' : userRole === 'DGIEA' ? 'review-requests' : userRole === 'direction' ? 'approve-requests' : 'system-admin'
+          onActionClick(viewId)
+        }}>
           Ver Todas
         </Button>
       </div>
@@ -141,7 +144,7 @@ export function QuickActions({ userRole, onActionClick }: QuickActionsProps) {
             {action.count && (
               <div className="flex items-center justify-between pt-4">
                 <span className="text-sm text-muted-foreground">{action.count}</span>
-                <Button variant="ghost" size="sm" className="h-8 px-3">
+                <Button variant="ghost" size="sm" className="h-8 px-3" onClick={() => onActionClick(action.id)}>
                   Ver →
                 </Button>
               </div>

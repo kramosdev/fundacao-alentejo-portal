@@ -11,26 +11,16 @@ export function useAuth() {
   const { toast } = useToast()
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Listen for auth changes FIRST (avoid missing events)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
-      if (session?.user) {
-        fetchProfile(session.user.id)
-      } else {
-        setLoading(false)
-      }
-    })
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      
       if (session?.user) {
-        await fetchProfile(session.user.id)
+        // Defer Supabase calls to avoid deadlocks in the callback
+        setTimeout(() => {
+          fetchProfile(session.user!.id)
+        }, 0)
       } else {
         setProfile(null)
         setLoading(false)
@@ -46,6 +36,17 @@ export function useAuth() {
           title: "Sessão terminada",
           description: "Até breve!"
         })
+      }
+    })
+
+    // THEN get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      setUser(session?.user ?? null)
+      if (session?.user) {
+        fetchProfile(session.user.id)
+      } else {
+        setLoading(false)
       }
     })
 
@@ -103,39 +104,41 @@ export function useAuth() {
   const signUpWithEmail = async (email: string, password: string, fullName: string) => {
     try {
       setLoading(true)
+
+      // Restrict domains
+      const allowedDomains = ['fundacao-alentejo.pt', 'correio.fundacao-alentejo.pt']
+      const emailDomain = email.split('@')[1]?.toLowerCase()
+      if (!allowedDomains.includes(emailDomain)) {
+        const errorMsg = 'Apenas emails @fundacao-alentejo.pt ou @correio.fundacao-alentejo.pt são permitidos.'
+        toast({ title: 'Domínio não permitido', description: errorMsg, variant: 'destructive' })
+        return { error: { message: errorMsg } }
+      }
+
+      const redirectUrl = `${window.location.origin}/dashboard`
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            full_name: fullName,
-          },
+          emailRedirectTo: redirectUrl,
+          data: { full_name: fullName },
         },
       })
 
       if (error) {
-        toast({
-          title: "Erro no registo",
-          description: error.message,
-          variant: "destructive"
-        })
+        toast({ title: 'Erro no registo', description: error.message, variant: 'destructive' })
         return { error }
       }
 
       if (data.user && !data.session) {
         toast({
-          title: "Verifique o seu email",
-          description: "Foi enviado um link de confirmação para o seu email"
+          title: 'Verifique o seu email',
+          description: 'Foi enviado um link de confirmação para o seu email'
         })
       }
 
       return { data }
     } catch (error: any) {
-      toast({
-        title: "Erro no registo",
-        description: error.message,
-        variant: "destructive"
-      })
+      toast({ title: 'Erro no registo', description: error.message, variant: 'destructive' })
       return { error }
     } finally {
       setLoading(false)
