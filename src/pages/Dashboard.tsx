@@ -114,7 +114,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header user={currentUser} />
+      <Header />
       
       {/* Hero Section */}
       <div className="relative overflow-hidden">

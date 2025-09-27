@@ -17,7 +17,7 @@ interface CreateRequestData {
 
 interface UpdateRequestStatusData {
   request_id: string
-  new_status: 'em_analise_dgiea' | 'enviado_direcao' | 'aprovado' | 'rejeitado'
+  new_status: 'submetido' | 'em_analise_dgiea' | 'enviado_direcao' | 'aprovado' | 'rejeitado'
   notes?: string
   decision?: string
 }
@@ -35,22 +35,36 @@ export function useRequests() {
 
   const fetchCategories = async () => {
     try {
-      // Categories fetch disabled until table is created
-      console.log('Categories fetch skipped - table not created yet')
+      const { data, error } = await supabase
+        .from('request_categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('name')
+
+      if (error) throw error
+      setCategories((data || []) as RequestCategory[])
+    } catch (error: any) {
+      console.error('Error fetching categories:', error)
       setCategories([])
-    } catch (error) {
-      console.error('Error in fetchCategories:', error)
     }
   }
 
   const fetchRequests = async () => {
     try {
       setLoading(true)
-      // Requests fetch disabled until table is created
-      console.log('Requests fetch skipped - table not created yet')
-      setRequests([])
+      const { data, error } = await supabase
+        .from('requests')
+        .select(`
+          *,
+          request_categories(name, description, type)
+        `)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setRequests((data || []) as Request[])
     } catch (error: any) {
-      console.error('Error in fetchRequests:', error)
+      console.error('Error fetching requests:', error)
+      setRequests([])
       toast({
         title: "Erro ao carregar requisições",
         description: error.message,

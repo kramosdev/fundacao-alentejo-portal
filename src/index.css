@@ -8,30 +8,31 @@
 
 @layer base {
   :root {
-    /* Fundação Alentejo Brand Colors */
-    --background: 210 20% 98%;
-    --foreground: 213 31% 12%;
+    /* Fundação Alentejo Brand Colors - Bordo Theme */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 213 31% 12%;
+    --card-foreground: 240 10% 3.9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 213 31% 12%;
+    --popover-foreground: 240 10% 3.9%;
 
-    /* Deep Navy Primary - Institutional Authority */
-    --primary: 213 31% 12%;
-    --primary-foreground: 210 20% 98%;
-    --primary-hover: 213 31% 18%;
+    /* Bordo Primary - Deep Burgundy */
+    --primary: 345 84% 23%;
+    --primary-foreground: 0 0% 98%;
+    --primary-hover: 345 84% 18%;
+    --primary-glow: 345 72% 35%;
 
-    /* Warm Gold Secondary - Portuguese Heritage */
-    --secondary: 45 85% 65%;
-    --secondary-foreground: 213 31% 12%;
-    --secondary-hover: 45 85% 55%;
+    /* Light Bordo Secondary */
+    --secondary: 345 20% 95%;
+    --secondary-foreground: 345 84% 23%;
+    --secondary-hover: 345 30% 90%;
 
-    /* Soft Blue Accent - Modern Trust */
-    --accent: 217 91% 60%;
-    --accent-foreground: 210 20% 98%;
-    --accent-hover: 217 91% 50%;
+    /* Medium Bordo Accent */
+    --accent: 345 72% 35%;
+    --accent-foreground: 0 0% 98%;
+    --accent-hover: 345 72% 30%;
 
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
@@ -51,8 +52,8 @@
 
     --radius: 0.75rem;
 
-    /* Elegant Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-hover)));
+    /* Elegant Gradients with Bordo */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
     --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--secondary-hover)));
     --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
     --gradient-card: linear-gradient(145deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
@@ -68,26 +69,27 @@
   }
 
   .dark {
-    --background: 213 31% 6%;
-    --foreground: 210 20% 98%;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
 
-    --card: 213 31% 8%;
-    --card-foreground: 210 20% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 213 31% 8%;
-    --popover-foreground: 210 20% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 210 20% 98%;
-    --primary-foreground: 213 31% 12%;
-    --primary-hover: 210 20% 88%;
+    --primary: 345 72% 45%;
+    --primary-foreground: 240 10% 3.9%;
+    --primary-hover: 345 72% 40%;
+    --primary-glow: 345 84% 55%;
 
-    --secondary: 45 85% 55%;
-    --secondary-foreground: 213 31% 12%;
-    --secondary-hover: 45 85% 45%;
+    --secondary: 345 20% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-hover: 345 30% 20%;
 
-    --accent: 217 91% 55%;
-    --accent-foreground: 210 20% 98%;
-    --accent-hover: 217 91% 45%;
+    --accent: 345 60% 35%;
+    --accent-foreground: 0 0% 98%;
+    --accent-hover: 345 60% 30%;
 
     --muted: 217 33% 12%;
     --muted-foreground: 215 20% 65%;

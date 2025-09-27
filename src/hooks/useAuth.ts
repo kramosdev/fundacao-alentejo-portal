@@ -54,10 +54,17 @@ export function useAuth() {
 
   const fetchProfile = async (userId: string) => {
     try {
-      // For now, just set loading to false since profiles table doesn't exist yet
-      console.log('Profile fetch skipped - table not created yet')
-    } catch (error) {
-      console.error('Error in fetchProfile:', error)
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single()
+
+      if (error) throw error
+      setProfile(data as Profile)
+    } catch (error: any) {
+      console.error('Error fetching profile:', error)
+      setProfile(null)
     } finally {
       setLoading(false)
     }
