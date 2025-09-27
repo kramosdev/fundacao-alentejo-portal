@@ -35,18 +35,9 @@ export function useRequests() {
 
   const fetchCategories = async () => {
     try {
-      const { data, error } = await supabase
-        .from('request_categories')
-        .select('*')
-        .eq('is_active', true)
-        .order('name')
-
-      if (error) {
-        console.error('Error fetching categories:', error)
-        return
-      }
-
-      setCategories(data || [])
+      // Categories fetch disabled until table is created
+      console.log('Categories fetch skipped - table not created yet')
+      setCategories([])
     } catch (error) {
       console.error('Error in fetchCategories:', error)
     }
@@ -55,28 +46,9 @@ export function useRequests() {
   const fetchRequests = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
-        .from('requests')
-        .select(`
-          *,
-          profiles!requests_user_id_fkey(full_name, email),
-          request_categories(name, type),
-          dgiea_user:profiles!requests_dgiea_user_id_fkey(full_name),
-          direction_user:profiles!requests_direction_user_id_fkey(full_name)
-        `)
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        console.error('Error fetching requests:', error)
-        toast({
-          title: "Erro ao carregar requisições",
-          description: error.message,
-          variant: "destructive"
-        })
-        return
-      }
-
-      setRequests(data || [])
+      // Requests fetch disabled until table is created
+      console.log('Requests fetch skipped - table not created yet')
+      setRequests([])
     } catch (error: any) {
       console.error('Error in fetchRequests:', error)
       toast({

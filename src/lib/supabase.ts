@@ -1,164 +1,74 @@
-import { createClient } from '@supabase/supabase-js'
-import type { Database } from '@/integrations/supabase/types'
+// Re-export the supabase client from the auto-generated integration
+export { supabase } from '@/integrations/supabase/client'
+export type { Database } from '@/integrations/supabase/types'
 
-// Centralized Supabase client (no env vars needed here)
-const SUPABASE_URL = 'https://ssbahthocmahojnduazb.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNzYmFodGhvY21haG9qbmR1YXpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg5Mjc0NTQsImV4cCI6MjA3NDUwMzQ1NH0.ucIIjNw3Y3RDMq0UfD-g4sz6srO2Ml7mbVL37pc3t8M'
-
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-  },
-})
-
-// Re-export database types for app-wide usage
-export type { Database }
-export type Profile = Database['public']['Tables']['profiles']['Row']
-export type Request = Database['public']['Tables']['requests']['Row']
-export type RequestCategory = Database['public']['Tables']['request_categories']['Row']
-export type Notification = Database['public']['Tables']['notifications']['Row']
-export type RequestHistory = Database['public']['Tables']['request_history']['Row']
-
-
-// Database types
-export interface Database {
-  public: {
-    Tables: {
-      profiles: {
-        Row: {
-          id: string
-          email: string
-          full_name: string
-          role: 'colaborador' | 'DGIEA' | 'direcao' | 'admin'
-          department?: string
-          phone?: string
-          avatar_url?: string
-          is_active: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id: string
-          email: string
-          full_name: string
-          role?: 'colaborador' | 'DGIEA' | 'direcao' | 'admin'
-          department?: string
-          phone?: string
-          avatar_url?: string
-          is_active?: boolean
-        }
-        Update: {
-          email?: string
-          full_name?: string
-          role?: 'colaborador' | 'DGIEA' | 'direcao' | 'admin'
-          department?: string
-          phone?: string
-          avatar_url?: string
-          is_active?: boolean
-        }
-      }
-      requests: {
-        Row: {
-          id: string
-          user_id: string
-          category_id: string
-          title: string
-          description: string
-          type: 'viatura' | 'alimentacao' | 'material' | 'outro'
-          status: 'submetido' | 'em_analise_dgiea' | 'enviado_direcao' | 'aprovado' | 'rejeitado'
-          priority: 'baixa' | 'media' | 'alta' | 'critica'
-          requested_date?: string
-          requested_time?: string
-          location?: string
-          additional_info?: any
-          attachments?: string[]
-          dgiea_user_id?: string
-          dgiea_notes?: string
-          dgiea_processed_at?: string
-          direction_user_id?: string
-          direction_decision?: string
-          direction_processed_at?: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          user_id: string
-          category_id: string
-          title: string
-          description: string
-          type: 'viatura' | 'alimentacao' | 'material' | 'outro'
-          priority?: 'baixa' | 'media' | 'alta' | 'critica'
-          requested_date?: string
-          requested_time?: string
-          location?: string
-          additional_info?: any
-          attachments?: string[]
-        }
-        Update: {
-          status?: 'submetido' | 'em_analise_dgiea' | 'enviado_direcao' | 'aprovado' | 'rejeitado'
-          dgiea_user_id?: string
-          dgiea_notes?: string
-          dgiea_processed_at?: string
-          direction_user_id?: string
-          direction_decision?: string
-          direction_processed_at?: string
-        }
-      }
-      request_categories: {
-        Row: {
-          id: string
-          name: string
-          description?: string
-          type: 'viatura' | 'alimentacao' | 'material' | 'outro'
-          is_active: boolean
-          requires_approval: boolean
-          created_at: string
-        }
-      }
-      notifications: {
-        Row: {
-          id: string
-          user_id: string
-          request_id?: string
-          title: string
-          message: string
-          type: string
-          is_read: boolean
-          created_at: string
-        }
-        Insert: {
-          user_id: string
-          request_id?: string
-          title: string
-          message: string
-          type?: string
-          is_read?: boolean
-        }
-        Update: {
-          is_read?: boolean
-        }
-      }
-      request_history: {
-        Row: {
-          id: string
-          request_id: string
-          user_id: string
-          action: string
-          old_status?: string
-          new_status?: string
-          notes?: string
-          metadata?: any
-          created_at: string
-        }
-      }
-    }
-  }
+// Define basic types for the application
+export interface Profile {
+  id: string
+  email: string
+  full_name: string
+  role: 'colaborador' | 'DGIEA' | 'direcao' | 'admin'
+  department?: string
+  phone?: string
+  avatar_url?: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
 }
 
-export type Profile = Database['public']['Tables']['profiles']['Row']
-export type Request = Database['public']['Tables']['requests']['Row']
-export type RequestCategory = Database['public']['Tables']['request_categories']['Row']
-export type Notification = Database['public']['Tables']['notifications']['Row']
-export type RequestHistory = Database['public']['Tables']['request_history']['Row']
+export interface Request {
+  id: string
+  user_id: string
+  category_id: string
+  title: string
+  description: string
+  type: 'viatura' | 'alimentacao' | 'material' | 'outro'
+  status: 'submetido' | 'em_analise_dgiea' | 'enviado_direcao' | 'aprovado' | 'rejeitado'
+  priority: 'baixa' | 'media' | 'alta' | 'critica'
+  requested_date?: string
+  requested_time?: string
+  location?: string
+  additional_info?: any
+  attachments?: string[]
+  dgiea_user_id?: string
+  dgiea_notes?: string
+  dgiea_processed_at?: string
+  direction_user_id?: string
+  direction_decision?: string
+  direction_processed_at?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface RequestCategory {
+  id: string
+  name: string
+  description?: string
+  type: 'viatura' | 'alimentacao' | 'material' | 'outro'
+  is_active: boolean
+  requires_approval: boolean
+  created_at: string
+}
+
+export interface Notification {
+  id: string
+  user_id: string
+  request_id?: string
+  title: string
+  message: string
+  type: string
+  is_read: boolean
+  created_at: string
+}
+
+export interface RequestHistory {
+  id: string
+  request_id: string
+  user_id: string
+  action: string
+  old_status?: string
+  new_status?: string
+  notes?: string
+  metadata?: any
+  created_at: string
+}

@@ -54,18 +54,8 @@ export function useAuth() {
 
   const fetchProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single()
-
-      if (error) {
-        console.error('Error fetching profile:', error)
-        return
-      }
-
-      setProfile(data)
+      // For now, just set loading to false since profiles table doesn't exist yet
+      console.log('Profile fetch skipped - table not created yet')
     } catch (error) {
       console.error('Error in fetchProfile:', error)
     } finally {
@@ -210,29 +200,12 @@ export function useAuth() {
 
     try {
       setLoading(true)
-      const { data, error } = await supabase
-        .from('profiles')
-        .update(updates as any)
-        .eq('id', user.id)
-        .select()
-        .single()
-
-      if (error) {
-        toast({
-          title: "Erro ao atualizar perfil",
-          description: error.message,
-          variant: "destructive"
-        })
-        return { error }
-      }
-
-      setProfile(data)
+      // Profile update disabled until profiles table is created
       toast({
-        title: "Perfil atualizado",
-        description: "As suas informações foram guardadas com sucesso"
+        title: "Funcionalidade em desenvolvimento",
+        description: "A atualização de perfil estará disponível em breve"
       })
-
-      return { data }
+      return { error: 'Profiles table not created yet' }
     } catch (error: any) {
       toast({
         title: "Erro ao atualizar perfil",
