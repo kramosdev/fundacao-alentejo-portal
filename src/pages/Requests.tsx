@@ -123,8 +123,8 @@ export default function Requests() {
         {/* Filters */}
         <Card className="mb-6">
           <CardContent className="pt-6">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1 relative">
+            <div className="flex flex-col gap-4">
+              <div className="w-full relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Pesquisar requisições..."
@@ -134,32 +134,34 @@ export default function Requests() {
                 />
               </div>
               
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os status</SelectItem>
-                  <SelectItem value="submetido">Submetido</SelectItem>
-                  <SelectItem value="em_analise_dgiea">Em Análise</SelectItem>
-                  <SelectItem value="enviado_direcao">Enviado à Direção</SelectItem>
-                  <SelectItem value="aprovado">Aprovado</SelectItem>
-                  <SelectItem value="rejeitado">Rejeitado</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full sm:w-[180px]">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos os status</SelectItem>
+                    <SelectItem value="submetido">Submetido</SelectItem>
+                    <SelectItem value="em_analise_dgiea">Em Análise</SelectItem>
+                    <SelectItem value="enviado_direcao">Enviado à Direção</SelectItem>
+                    <SelectItem value="aprovado">Aprovado</SelectItem>
+                    <SelectItem value="rejeitado">Rejeitado</SelectItem>
+                  </SelectContent>
+                </Select>
 
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os tipos</SelectItem>
-                  <SelectItem value="viatura">Viatura</SelectItem>
-                  <SelectItem value="alimentacao">Alimentação</SelectItem>
-                  <SelectItem value="material">Material</SelectItem>
-                  <SelectItem value="outro">Outro</SelectItem>
-                </SelectContent>
-              </Select>
+                <Select value={typeFilter} onValueChange={setTypeFilter}>
+                  <SelectTrigger className="w-full sm:w-[180px]">
+                    <SelectValue placeholder="Tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos os tipos</SelectItem>
+                    <SelectItem value="viatura">Viatura</SelectItem>
+                    <SelectItem value="alimentacao">Alimentação</SelectItem>
+                    <SelectItem value="material">Material</SelectItem>
+                    <SelectItem value="outro">Outro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -212,7 +214,7 @@ export default function Requests() {
                       </CardHeader>
                       
                       <CardContent>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                           <div>
                             <span className="font-medium text-muted-foreground">Tipo:</span>
                             <p className="capitalize">{request.type}</p>
@@ -227,7 +229,7 @@ export default function Requests() {
                           </div>
                           <div>
                             <span className="font-medium text-muted-foreground">Localização:</span>
-                            <p>{request.location || 'N/A'}</p>
+                            <p className="truncate">{request.location || 'N/A'}</p>
                           </div>
                         </div>
 
@@ -287,7 +289,7 @@ export default function Requests() {
                       </CardHeader>
                       
                       <CardContent>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm mb-4">
                           <div>
                             <span className="font-medium text-muted-foreground">Tipo:</span>
                             <p className="capitalize">{request.type}</p>
@@ -302,15 +304,16 @@ export default function Requests() {
                           </div>
                           <div>
                             <span className="font-medium text-muted-foreground">Localização:</span>
-                            <p>{request.location || 'N/A'}</p>
+                            <p className="truncate">{request.location || 'N/A'}</p>
                           </div>
                         </div>
 
                         {/* Action buttons for DGIEA and Direction */}
                         {profile?.role === 'DGIEA' && request.status === 'submetido' && (
-                          <div className="flex gap-2 mt-4">
+                          <div className="flex flex-col sm:flex-row gap-2 mt-4">
                             <Button 
                               size="sm" 
+                              className="w-full sm:w-auto"
                               onClick={() => handleStatusUpdate(request.id, 'em_analise_dgiea', 'Em análise pela DGIEA')}
                             >
                               Aceitar para Análise
@@ -318,6 +321,7 @@ export default function Requests() {
                             <Button 
                               size="sm" 
                               variant="outline"
+                              className="w-full sm:w-auto"
                               onClick={() => handleStatusUpdate(request.id, 'enviado_direcao', 'Enviado à direção para decisão')}
                             >
                               Enviar à Direção
@@ -327,9 +331,10 @@ export default function Requests() {
 
                         {(profile?.role === 'direcao' || profile?.role === 'admin') && 
                          (request.status === 'enviado_direcao' || request.status === 'em_analise_dgiea') && (
-                          <div className="flex gap-2 mt-4">
+                          <div className="flex flex-col sm:flex-row gap-2 mt-4">
                             <Button 
                               size="sm"
+                              className="w-full sm:w-auto"
                               onClick={() => handleStatusUpdate(request.id, 'aprovado', 'Requisição aprovada pela direção')}
                             >
                               Aprovar
@@ -337,6 +342,7 @@ export default function Requests() {
                             <Button 
                               size="sm" 
                               variant="destructive"
+                              className="w-full sm:w-auto"
                               onClick={() => handleStatusUpdate(request.id, 'rejeitado', 'Requisição rejeitada pela direção')}
                             >
                               Rejeitar

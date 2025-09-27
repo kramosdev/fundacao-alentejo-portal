@@ -24,11 +24,25 @@ serve(async (req) => {
     )
 
     // Get the authorization header from the request
-    const authHeader = req.headers.get('Authorization')!
-    supabase.auth.setSession({
-      access_token: authHeader.replace('Bearer ', ''),
-      refresh_token: '',
-    })
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Set session properly
+    const token = authHeader.replace('Bearer ', '')
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token)
+    
+    if (userError || !user) {
+      console.error('Auth error:', userError)
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
     const { data: requestData } = await req.json()
 
@@ -40,12 +54,17 @@ serve(async (req) => {
       )
     }
 
-    // Get current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
-    if (userError || !user) {
+    // Get user profile to ensure proper foreign key reference
+    const { data: userProfile } = await supabase
+      .from('profiles')
+      .select('user_id, full_name, email')
+      .eq('user_id', user.id)
+      .single()
+
+    if (!userProfile) {
       return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'User profile not found' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
@@ -89,17 +108,17 @@ serve(async (req) => {
     // Get DGIEA users for notification
     const { data: dgieaUsers } = await supabase
       .from('profiles')
-      .select('id')
+      .select('user_id, full_name, email')
       .eq('role', 'DGIEA')
       .eq('is_active', true)
 
     // Create notifications for DGIEA users
     if (dgieaUsers && dgieaUsers.length > 0) {
       const notifications = dgieaUsers.map(dgieaUser => ({
-        user_id: dgieaUser.id,
+        user_id: dgieaUser.user_id,
         request_id: request.id,
         title: 'Nova Requisição',
-        message: `Nova requisição "${request.title}" submetida por ${user.email}`,
+        message: `Nova requisição "${request.title}" submetida por ${userProfile.full_name || userProfile.email}`,
         type: 'info'
       }))
 

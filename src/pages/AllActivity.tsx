@@ -62,26 +62,14 @@ export default function AllActivity() {
       // Fetch incidents
       const { data: incidents } = await supabase
         .from('incidents')
-        .select('*')
+        .select(`
+          *,
+          profiles!incidents_user_id_fkey(full_name, email)
+        `)
         .order('created_at', { ascending: false })
 
       if (incidents) {
-        const incidentsWithProfiles = await Promise.all(
-          incidents.map(async (incident) => {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('full_name, email')
-              .eq('user_id', incident.user_id)
-              .single()
-
-            return {
-              ...incident,
-              profiles: profile
-            }
-          })
-        )
-
-        incidentsWithProfiles.forEach(incident => {
+        incidents.forEach(incident => {
           allActivities.push({
             id: incident.id,
             type: 'incident',
