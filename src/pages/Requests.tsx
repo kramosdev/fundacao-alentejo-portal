@@ -12,6 +12,7 @@ import { NewRequestForm } from "@/components/forms/NewRequestForm"
 import { Header } from "@/components/Header"
 import { Plus, Search, Filter, Clock, CheckCircle2, AlertCircle, XCircle, FileText } from "lucide-react"
 import { format } from "date-fns"
+import { pt } from "date-fns/locale"
 
 const statusColors = {
   'submetido': 'bg-blue-100 text-blue-800 border-blue-200',
@@ -222,7 +223,7 @@ export default function Requests() {
                           </div>
                           <div>
                             <span className="font-medium text-muted-foreground">Data:</span>
-                            <p>{format(new Date(request.created_at), 'dd/MM/yyyy')}</p>
+                            <p>{format(new Date(request.created_at), 'dd/MM/yyyy', { locale: pt })}</p>
                           </div>
                           <div>
                             <span className="font-medium text-muted-foreground">Localização:</span>
@@ -297,7 +298,7 @@ export default function Requests() {
                           </div>
                           <div>
                             <span className="font-medium text-muted-foreground">Data:</span>
-                            <p>{format(new Date(request.created_at), 'dd/MM/yyyy')}</p>
+                            <p>{format(new Date(request.created_at), 'dd/MM/yyyy', { locale: pt })}</p>
                           </div>
                           <div>
                             <span className="font-medium text-muted-foreground">Localização:</span>

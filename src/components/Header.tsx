@@ -11,10 +11,12 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Bell, User, LogOut, Settings, Menu, X, Home, FileText, UserCircle } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
+import { useNotifications } from "@/hooks/useNotifications"
 import { useNavigate, useLocation } from "react-router-dom"
 
 export function Header() {
   const { user, profile, signOut } = useAuth()
+  const { unreadCount } = useNotifications()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
@@ -24,11 +26,22 @@ export function Header() {
     navigate('/login')
   }
 
-  const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Requisições', href: '/requests', icon: FileText },
-    { name: 'Perfil', href: '/profile', icon: UserCircle },
-  ]
+  const getNavigation = () => {
+    const baseNav = [
+      { name: 'Dashboard', href: '/dashboard', icon: Home },
+      { name: 'Requisições', href: '/requests', icon: FileText },
+      { name: 'Perfil', href: '/profile', icon: UserCircle },
+    ]
+    
+    // Add admin link for admin users
+    if (profile?.role === 'admin') {
+      baseNav.push({ name: 'Admin', href: '/admin', icon: Settings })
+    }
+    
+    return baseNav
+  }
+
+  const navigation = getNavigation()
 
   const isActive = (href: string) => location.pathname === href
 
@@ -106,9 +119,11 @@ export function Header() {
             {/* Notifications */}
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-4 w-4" />
-              <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-destructive text-xs text-destructive-foreground flex items-center justify-center">
-                2
-              </span>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-destructive text-xs text-destructive-foreground flex items-center justify-center">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </Button>
 
             {/* User dropdown */}

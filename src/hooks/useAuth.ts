@@ -58,7 +58,7 @@ export function useAuth() {
         .from('profiles')
         .select('*')
         .eq('user_id', userId)
-        .single()
+        .maybeSingle()
 
       if (error) throw error
       setProfile(data as Profile)
@@ -207,12 +207,22 @@ export function useAuth() {
 
     try {
       setLoading(true)
-      // Profile update disabled until profiles table is created
+      const { data, error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('user_id', user.id)
+        .select()
+        .single()
+
+      if (error) throw error
+      
+      setProfile(data as Profile)
       toast({
-        title: "Funcionalidade em desenvolvimento",
-        description: "A atualização de perfil estará disponível em breve"
+        title: "Perfil atualizado",
+        description: "As suas informações foram atualizadas com sucesso"
       })
-      return { error: 'Profiles table not created yet' }
+      
+      return { data }
     } catch (error: any) {
       toast({
         title: "Erro ao atualizar perfil",

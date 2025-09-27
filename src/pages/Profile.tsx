@@ -11,6 +11,8 @@ import { Header } from "@/components/Header"
 import { supabase } from "@/lib/supabase"
 import { useToast } from "@/hooks/use-toast"
 import { User, Mail, Phone, Building, Shield, Calendar, Save } from "lucide-react"
+import { format } from "date-fns"
+import { pt } from "date-fns/locale"
 
 const roleLabels = {
   'colaborador': 'Colaborador',
@@ -146,7 +148,7 @@ export default function Profile() {
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>Membro desde {new Date(profile?.created_at || '').toLocaleDateString('pt-PT')}</span>
+                <span>Membro desde {profile?.created_at ? format(new Date(profile.created_at), 'dd/MM/yyyy', { locale: pt }) : 'Data não disponível'}</span>
               </div>
             </CardContent>
           </Card>
@@ -279,21 +281,13 @@ export default function Profile() {
               <div>
                 <Label className="text-sm font-medium">Data de Criação</Label>
                 <p className="text-sm text-muted-foreground">
-                  {new Date(profile?.created_at || '').toLocaleDateString('pt-PT', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
+                  {profile?.created_at ? format(new Date(profile.created_at), 'dd \'de\' MMMM \'de\' yyyy', { locale: pt }) : 'Data não disponível'}
                 </p>
               </div>
               <div>
                 <Label className="text-sm font-medium">Última Atualização</Label>
                 <p className="text-sm text-muted-foreground">
-                  {new Date(profile?.updated_at || '').toLocaleDateString('pt-PT', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
+                  {profile?.updated_at ? format(new Date(profile.updated_at), 'dd \'de\' MMMM \'de\' yyyy', { locale: pt }) : 'Data não disponível'}
                 </p>
               </div>
             </div>

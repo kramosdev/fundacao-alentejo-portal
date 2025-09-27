@@ -11,6 +11,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { BarChart3, TrendingUp, Clock, CheckCircle } from "lucide-react";
 import heroBanner from "@/assets/hero-banner.jpg";
 import { NewRequestForm } from "@/components/forms/NewRequestForm";
+import { format } from "date-fns";
+import { pt } from "date-fns/locale";
 
 export default function Dashboard() {
   const { user, profile, loading } = useAuth()
@@ -175,7 +177,7 @@ export default function Dashboard() {
             <Card className="portal-card">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg">Progresso Mensal</CardTitle>
-                <CardDescription>Objetivos e metas de {new Date().toLocaleDateString('pt-PT', { month: 'long' })}</CardDescription>
+                <CardDescription>Objetivos e metas de {format(new Date(), 'MMMM', { locale: pt })}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
