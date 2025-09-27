@@ -62,14 +62,26 @@ export default function AllActivity() {
       // Fetch incidents
       const { data: incidents } = await supabase
         .from('incidents')
-        .select(`
-          *,
-          profiles(full_name, email)
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
 
       if (incidents) {
-        incidents.forEach(incident => {
+        const incidentsWithProfiles = await Promise.all(
+          incidents.map(async (incident) => {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('full_name, email')
+              .eq('user_id', incident.user_id)
+              .single()
+
+            return {
+              ...incident,
+              profiles: profile
+            }
+          })
+        )
+
+        incidentsWithProfiles.forEach(incident => {
           allActivities.push({
             id: incident.id,
             type: 'incident',
@@ -77,8 +89,8 @@ export default function AllActivity() {
             description: incident.description,
             status: incident.status,
             priority: incident.priority,
-            user_name: incident.profiles?.full_name,
-            user_email: incident.profiles?.email,
+            user_name: incident.profiles?.full_name || 'Utilizador',
+            user_email: incident.profiles?.email || 'N/A',
             created_at: incident.created_at
           })
         })

@@ -25,7 +25,7 @@ interface IncidentComment {
     full_name: string
     email: string
     role: string
-  }
+  } | null
 }
 
 interface IncidentTicketSystemProps {
@@ -62,14 +62,36 @@ export function IncidentTicketSystem({
       const { data, error } = await supabase
         .from('incident_comments')
         .select(`
-          *,
-          profiles(full_name, email, role)
+          id,
+          incident_id,
+          user_id,
+          comment,
+          is_internal,
+          attachments,
+          created_at
         `)
         .eq('incident_id', incidentId)
         .order('created_at', { ascending: true })
 
       if (error) throw error
-      setComments((data || []) as IncidentComment[])
+
+      // Fetch user profiles separately for each comment
+      const commentsWithProfiles = await Promise.all(
+        (data || []).map(async (comment) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, email, role')
+            .eq('user_id', comment.user_id)
+            .single()
+
+          return {
+            ...comment,
+            profiles: profile
+          }
+        })
+      )
+
+      setComments(commentsWithProfiles)
     } catch (error: any) {
       console.error('Error fetching comments:', error)
     }
