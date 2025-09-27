@@ -1,17 +1,15 @@
 import { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { Header } from "@/components/Header";
+import { ModernHeader } from "@/components/ModernHeader";
 import { QuickActions } from "@/components/QuickActions";
 import { RealActivity } from "@/components/RealActivity";
-import { RealStats } from "@/components/RealStats";
+import { EnhancedDashboard } from "@/components/EnhancedDashboard";
+import { RealTimeUpdates } from "@/components/RealTimeUpdates";
 import { DashboardCard } from "@/components/DashboardCard";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useRequests } from "@/hooks/useRequests";
-import { BarChart3, TrendingUp, Clock, CheckCircle } from "lucide-react";
-import heroBanner from "@/assets/hero-banner.jpg";
+import { BarChart3, BookOpen, HelpCircle } from "lucide-react";
 import { NewRequestForm } from "@/components/forms/NewRequestForm";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
@@ -122,34 +120,56 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <ModernHeader />
+      <RealTimeUpdates />
       
-        {/* Hero Section */}
+      {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div 
-          className="h-64 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `linear-gradient(135deg, rgba(33, 41, 60, 0.85), rgba(55, 125, 255, 0.7)), url(${heroBanner})`
-          }}
-        >
-          <div className="container h-full flex items-center justify-between">
-            <div className="text-white space-y-3 animate-fade-up">
-              <h1 className="text-4xl font-bold">
-                Bem-vindo, {currentUser.name.split(' ')[0]}
-              </h1>
-              <p className="text-xl text-white/90">
-                {getWelcomeMessage()}
-              </p>
-              <div className="text-sm text-white/80 space-y-1">
-                <p>📅 Hoje: {format(new Date(), "EEEE, d 'de' MMMM 'de' yyyy", { locale: pt })}</p>
-                <p>🕐 {format(new Date(), 'HH:mm', { locale: pt })}</p>
+        <div className="h-72 bg-gradient-to-br from-primary via-primary-hover to-accent relative">
+          {/* Decorative elements */}
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent"></div>
+          <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+          <div className="absolute bottom-10 left-20 w-20 h-20 bg-white/5 rounded-full blur-lg"></div>
+          
+          <div className="container h-full flex items-center justify-between relative z-10">
+            <div className="text-white space-y-4 animate-fade-up max-w-2xl">
+              <div className="space-y-2">
+                <p className="text-sm text-white/70 font-medium uppercase tracking-wider">
+                  Portal de Gestão
+                </p>
+                <h1 className="text-5xl font-bold leading-tight">
+                  Bem-vindo, {currentUser.name.split(' ')[0]}
+                </h1>
+                <p className="text-xl text-white/90 leading-relaxed">
+                  {getWelcomeMessage()}
+                </p>
+              </div>
+              <div className="flex items-center gap-6 text-sm text-white/80">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-white/60 rounded-full"></div>
+                  <span>{format(new Date(), "EEEE, d 'de' MMMM", { locale: pt })}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-white/60 rounded-full"></div>
+                  <span>{format(new Date(), 'HH:mm', { locale: pt })}</span>
+                </div>
               </div>
             </div>
-            <div className="hidden md:block text-white/60 text-right animate-fade-up" style={{ animationDelay: '0.2s' }}>
-              <div className="space-y-2">
-                <div className="text-sm">Sistema de Gestão</div>
-                <div className="text-2xl font-bold">FGA</div>
-                <div className="text-xs">Fundação Gestão Alentejo</div>
+            
+            <div className="hidden lg:block text-white/70 text-right animate-fade-up space-y-4" style={{ animationDelay: '0.2s' }}>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                <div className="space-y-3">
+                  <div className="text-xs font-medium uppercase tracking-wider">Sistema</div>
+                  <div className="text-3xl font-bold text-white">Fundação Alentejo</div>
+                  <div className="text-xs text-white/70">Portal de Gestão Integrado</div>
+                  <div className="w-full h-px bg-white/20 my-3"></div>
+                  <div className="text-xs">
+                    <div className="flex justify-between">
+                      <span>Status:</span>
+                      <span className="text-green-300">Operacional</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -158,58 +178,43 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="container py-8 space-y-8">
-        {/* Stats Overview - Real Data */}
-        <RealStats />
+        {/* Enhanced Dashboard with Real Data */}
+        <div className="animate-fade-up">
+          <EnhancedDashboard />
+        </div>
 
         {/* Quick Actions */}
         <div className="animate-slide-right">
           <QuickActions userRole={currentUser.role} onActionClick={handleActionClick} />
         </div>
 
-        {/* Real Activity from Database */}
+        {/* Real Activity and Additional Widgets */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 animate-fade-up" style={{ animationDelay: '0.3s' }}>
             <RealActivity />
           </div>
           
           <div className="space-y-6 animate-fade-up" style={{ animationDelay: '0.4s' }}>
-            {/* Monthly Progress - Real Data */}
-            <Card className="portal-card">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg">Progresso Mensal</CardTitle>
-                <CardDescription>Objetivos e metas de {format(new Date(), 'MMMM', { locale: pt })}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Requisições Este Mês</span>
-                    <span>{Math.min(requests?.length || 0, 50)}/50</span>
-                  </div>
-                  <Progress value={Math.min(((requests?.length || 0) / 50) * 100, 100)} className="h-2" />
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Taxa de Aprovação</span>
-                    <span>{requests?.length > 0 ? Math.round((requests.filter(r => r.status === 'aprovado').length / requests.length) * 100) : 0}%</span>
-                  </div>
-                  <Progress value={requests?.length > 0 ? (requests.filter(r => r.status === 'aprovado').length / requests.length) * 100 : 0} className="h-2" />
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Eficiência do Sistema</span>
-                    <span>{Math.round(((requests?.filter(r => r.status !== 'submetido').length || 0) / Math.max(requests?.length || 1, 1)) * 100)}%</span>
-                  </div>
-                  <Progress value={((requests?.filter(r => r.status !== 'submetido').length || 0) / Math.max(requests?.length || 1, 1)) * 100} className="h-2" />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Quick Links */}
+            {/* Resources and Help */}
             <DashboardCard
-              title="Centro de Ajuda"
-              description="Documentação e suporte técnico"
-              icon={BarChart3}
+              title="Centro de Recursos"
+              description="Documentação, tutoriais e FAQ"
+              icon={BookOpen}
               variant="accent"
+            />
+            
+            <DashboardCard
+              title="Suporte Técnico"
+              description="Obtenha ajuda e suporte"
+              icon={HelpCircle}
+              variant="secondary"
+            />
+            
+            <DashboardCard
+              title="Relatórios Avançados"
+              description="Analytics e insights detalhados"
+              icon={BarChart3}
+              variant="primary"
             />
           </div>
         </div>
@@ -217,7 +222,7 @@ export default function Dashboard() {
 
       {/* New Request Modal */}
       <Dialog open={openNewRequest} onOpenChange={setOpenNewRequest}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <NewRequestForm onSuccess={() => setOpenNewRequest(false)} onCancel={() => setOpenNewRequest(false)} />
         </DialogContent>
       </Dialog>

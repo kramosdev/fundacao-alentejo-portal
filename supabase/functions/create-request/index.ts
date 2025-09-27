@@ -34,7 +34,19 @@ serve(async (req) => {
 
     // Set session properly
     const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token)
+    
+    // Create authenticated supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: authHeader }
+        }
+      }
+    )
+    
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token)
     
     if (userError || !user) {
       console.error('Auth error:', userError)
@@ -55,7 +67,7 @@ serve(async (req) => {
     }
 
     // Get user profile to ensure proper foreign key reference
-    const { data: userProfile } = await supabase
+    const { data: userProfile } = await supabaseClient
       .from('profiles')
       .select('user_id, full_name, email')
       .eq('user_id', user.id)
@@ -69,7 +81,7 @@ serve(async (req) => {
     }
 
     // Create the request
-    const { data: request, error: requestError } = await supabase
+    const { data: request, error: requestError } = await supabaseClient
       .from('requests')
       .insert({
         user_id: user.id,
@@ -95,7 +107,7 @@ serve(async (req) => {
     }
 
     // Create initial history entry
-    await supabase
+    await supabaseClient
       .from('request_history')
       .insert({
         request_id: request.id,
@@ -106,7 +118,7 @@ serve(async (req) => {
       })
 
     // Get DGIEA users for notification
-    const { data: dgieaUsers } = await supabase
+    const { data: dgieaUsers } = await supabaseClient
       .from('profiles')
       .select('user_id, full_name, email')
       .eq('role', 'DGIEA')
@@ -122,7 +134,7 @@ serve(async (req) => {
         type: 'info'
       }))
 
-      await supabase
+      await supabaseClient
         .from('notifications')
         .insert(notifications)
     }
