@@ -28,16 +28,25 @@ export default function Dashboard() {
     )
   }
 
+  // Map database roles to component roles
+  const mapRole = (dbRole: 'colaborador' | 'DGIEA' | 'direcao' | 'admin'): 'user' | 'DGIEA' | 'direction' | 'admin' => {
+    switch (dbRole) {
+      case 'colaborador': return 'user';
+      case 'direcao': return 'direction';
+      default: return dbRole;
+    }
+  };
+
   // Use profile data if available, otherwise fallback
   const currentUser = profile ? {
     name: profile.full_name,
     email: profile.email,
-    role: profile.role,
+    role: mapRole(profile.role),
     avatar: profile.avatar_url
   } : {
     name: user?.email?.split('@')[0] || "Utilizador",
     email: user?.email || "",
-    role: 'colaborador' as const
+    role: 'user' as const
   }
 
   const handleActionClick = (action: string) => {
@@ -59,7 +68,7 @@ export default function Dashboard() {
   };
 
   const getWelcomeMessage = () => {
-    switch (user.role) {
+    switch (currentUser.role) {
       case 'DGIEA':
         return 'Gerir e processar pedidos da Fundação';
       case 'direction':
@@ -72,7 +81,7 @@ export default function Dashboard() {
   };
 
   const getStatsCards = () => {
-    switch (user.role) {
+    switch (currentUser.role) {
       case 'DGIEA':
         return [
           { title: 'Pedidos Pendentes', value: '8', change: '+12%', icon: Clock },
@@ -80,7 +89,7 @@ export default function Dashboard() {
           { title: 'Taxa Aprovação', value: '89%', change: '+2%', icon: TrendingUp },
           { title: 'Tempo Médio', value: '2.4d', change: '-15%', icon: BarChart3 }
         ];
-      case 'direcao':
+      case 'direction':
         return [
           { title: 'Aprovações Pendentes', value: '5', change: '-10%', icon: Clock },
           { title: 'Aprovados Este Mês', value: '156', change: '+18%', icon: CheckCircle },
