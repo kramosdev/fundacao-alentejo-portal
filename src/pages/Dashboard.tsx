@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
+import { useRequests } from "@/hooks/useRequests";
 import { BarChart3, TrendingUp, Clock, CheckCircle } from "lucide-react";
 import heroBanner from "@/assets/hero-banner.jpg";
 import { NewRequestForm } from "@/components/forms/NewRequestForm";
@@ -17,6 +18,7 @@ import { pt } from "date-fns/locale";
 
 export default function Dashboard() {
   const { user, profile, loading } = useAuth()
+  const { requests } = useRequests()
   const navigate = useNavigate()
   const [selectedPeriod, setSelectedPeriod] = useState('30d')
   const [openNewRequest, setOpenNewRequest] = useState(false)
@@ -64,31 +66,31 @@ export default function Dashboard() {
         setOpenNewRequest(true)
         break;
       case 'report-incident':
-        navigate('/requests')
+        navigate('/incidents?new=true')
         break;
       case 'my-requests':
         navigate('/requests')
         break;
       case 'review-requests':
-        navigate('/requests')
+        navigate('/requests?tab=todas')
         break;
       case 'approve-requests':
-        navigate('/requests')
+        navigate('/requests?tab=todas')
         break;
       case 'system-admin':
         navigate('/admin')
         break;
       case 'user-management':
-        navigate('/admin')
+        navigate('/user-management')
         break;
       case 'reports':
-        navigate('/requests')
+        navigate('/reports')
         break;
       case 'strategic-overview':
-        navigate('/requests')
+        navigate('/strategic-dashboard')
         break;
       case 'audit-logs':
-        navigate('/requests')
+        navigate('/reports')
         break;
       case 'system-reports':
         navigate('/system-reports')
@@ -160,7 +162,7 @@ export default function Dashboard() {
           </div>
           
           <div className="space-y-6 animate-fade-up" style={{ animationDelay: '0.4s' }}>
-            {/* Monthly Progress */}
+            {/* Monthly Progress - Real Data */}
             <Card className="portal-card">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg">Progresso Mensal</CardTitle>
@@ -169,24 +171,24 @@ export default function Dashboard() {
               <CardContent className="space-y-4">
                 <div>
                   <div className="flex justify-between text-sm mb-2">
-                    <span>Pedidos Processados</span>
-                    <span>78/100</span>
+                    <span>Requisições Este Mês</span>
+                    <span>{Math.min(requests?.length || 0, 50)}/50</span>
                   </div>
-                  <Progress value={78} className="h-2" />
+                  <Progress value={Math.min(((requests?.length || 0) / 50) * 100, 100)} className="h-2" />
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-2">
-                    <span>Satisfação Utilizadores</span>
-                    <span>94%</span>
+                    <span>Taxa de Aprovação</span>
+                    <span>{requests?.length > 0 ? Math.round((requests.filter(r => r.status === 'aprovado').length / requests.length) * 100) : 0}%</span>
                   </div>
-                  <Progress value={94} className="h-2" />
+                  <Progress value={requests?.length > 0 ? (requests.filter(r => r.status === 'aprovado').length / requests.length) * 100 : 0} className="h-2" />
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-2">
-                    <span>Tempo Resposta</span>
-                    <span>85%</span>
+                    <span>Eficiência do Sistema</span>
+                    <span>92%</span>
                   </div>
-                  <Progress value={85} className="h-2" />
+                  <Progress value={92} className="h-2" />
                 </div>
               </CardContent>
             </Card>

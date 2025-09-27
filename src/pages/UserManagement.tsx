@@ -92,7 +92,7 @@ export default function UserManagement() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setUsers(data || [])
+      setUsers((data || []) as User[])
     } catch (error: any) {
       toast({
         title: "Erro ao carregar utilizadores",

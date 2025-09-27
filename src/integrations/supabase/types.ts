@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      incidents: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          id: string
+          it_notes: string | null
+          it_user_id: string | null
+          location: string | null
+          priority: string
+          resolved_at: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          it_notes?: string | null
+          it_user_id?: string | null
+          location?: string | null
+          priority?: string
+          resolved_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          it_notes?: string | null
+          it_user_id?: string | null
+          location?: string | null
+          priority?: string
+          resolved_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string

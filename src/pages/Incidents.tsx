@@ -114,11 +114,6 @@ export default function Incidents() {
   const fetchIncidents = async () => {
     try {
       setIsLoading(true)
-      
-      // Create incidents table if it doesn't exist (this would be done via migration in real app)
-      await supabase.rpc('create_incidents_table').catch(() => {
-        // Table might already exist, ignore error
-      })
 
       const { data, error } = await supabase
         .from('incidents')
@@ -128,21 +123,16 @@ export default function Incidents() {
         `)
         .order('created_at', { ascending: false })
 
-      if (error && !error.message.includes('relation "incidents" does not exist')) {
-        throw error
-      }
+      if (error) throw error
       
-      setIncidents(data || [])
+      setIncidents((data || []) as any[])
     } catch (error: any) {
       console.error('Error fetching incidents:', error)
-      // Don't show error toast if table doesn't exist yet
-      if (!error.message.includes('relation "incidents" does not exist')) {
-        toast({
-          title: "Erro ao carregar incidentes",
-          description: error.message,
-          variant: "destructive"
-        })
-      }
+      toast({
+        title: "Erro ao carregar incidentes",
+        description: error.message,
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
